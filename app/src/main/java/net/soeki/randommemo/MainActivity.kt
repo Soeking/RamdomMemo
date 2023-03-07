@@ -25,7 +25,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val list =(1..100).map { "list $it" }
-                    ListScreen(recordList = list)
+                    ListScreen(list)
                 }
             }
         }
