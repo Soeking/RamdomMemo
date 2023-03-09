@@ -12,11 +12,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.room.Room
+import net.soeki.randommemo.db.*
 import net.soeki.randommemo.ui.theme.RandomMemoTheme
 
 class MainActivity : ComponentActivity() {
+    private lateinit var database:AccessDatabase
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        database = AccessDatabase(applicationContext)
         setContent {
             RandomMemoTheme {
                 // A surface container using the 'background' color from the theme
@@ -24,7 +29,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val list =(1..100).map { "list $it" }
+                    val list = (1..100).map { "list $it" }
                     ListScreen(list)
                 }
             }

@@ -1,24 +1,22 @@
 package net.soeki.randommemo.db
 
 import androidx.room.*
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface NoteDataDao {
-    @Query("SELECT * FROM noteData")
-    fun getAll(): List<NoteData>
-
-    @Query("SELECT text FROM noteData")
-    fun getAllTexts(): List<String>
+    @Query("SELECT id, text FROM noteData")
+    suspend fun getAllForList(): List<NoteOnList>
 
     @Query("SELECT * FROM noteData WHERE id = :targetId")
-    fun getById(targetId:Long): NoteData
+    suspend fun getById(targetId: Long): NoteData
 
-    @Insert
-    fun insert(record: NoteData)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(record: NoteData)
 
     @Update
-    fun update(record: NoteData)
+    suspend fun update(record: NoteData)
 
     @Delete
-    fun delete(record: NoteData)
+    suspend fun delete(record: NoteData)
 }
