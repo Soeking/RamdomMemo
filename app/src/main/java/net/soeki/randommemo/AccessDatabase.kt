@@ -12,38 +12,40 @@ class AccessDatabase(applicationContext: Context) {
     private val database = Room.databaseBuilder(
         applicationContext,
         NoteDatabase::class.java,
-        "noteData"
+        "noteDatabase"
     ).build()
 
     private val dao = database.noteDataDao()
 
-    fun getList(): List<NoteOnList> {
-        return CoroutineScope(Dispatchers.IO).async {
+    fun getList(): List<NoteOnList> = runBlocking {
+        withContext(CoroutineScope(Dispatchers.IO).coroutineContext) {
             dao.getAllForList()
-        }.getCompleted()
+        }
     }
 
-    fun getNote(targetId: Long): NoteData {
-        return CoroutineScope(Dispatchers.IO).async {
+    fun getNote(targetId: Long): NoteData = runBlocking {
+        withContext(CoroutineScope(Dispatchers.IO).coroutineContext) {
             dao.getById(targetId)
-        }.getCompleted()
+        }
     }
 
-    fun insertNote(note: NoteData): Boolean {
-        return CoroutineScope(Dispatchers.IO).launch {
+    fun insertNote(note: NoteData): Boolean = runBlocking {
+        CoroutineScope(Dispatchers.IO).launch {
             dao.insert(note)
         }.isCompleted
     }
 
-    fun updateNote(note: NoteData): Boolean {
-        return CoroutineScope(Dispatchers.IO).launch {
+    fun updateNote(note: NoteData): Boolean = runBlocking {
+        CoroutineScope(Dispatchers.IO).launch {
             dao.update(note)
         }.isCompleted
     }
 
-    fun deleteNote(id: Long): Boolean {
-        return CoroutineScope(Dispatchers.IO).launch {
-            dao.getById(id).let { dao.delete(it) }
+    fun deleteNote(id: Long): Boolean = runBlocking {
+        CoroutineScope(Dispatchers.IO).launch {
+            withContext(Dispatchers.Default) {
+                dao.getById(id)
+            }.let { dao.delete(it) }
         }.isCompleted
     }
 }

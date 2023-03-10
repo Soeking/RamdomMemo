@@ -3,21 +3,22 @@ package net.soeki.randommemo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.room.Room
+import androidx.compose.ui.unit.dp
 import net.soeki.randommemo.db.*
 import net.soeki.randommemo.ui.theme.RandomMemoTheme
 
 class MainActivity : ComponentActivity() {
-    private lateinit var database:AccessDatabase
+    private lateinit var database: AccessDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,8 +30,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val list = (1..100).map { "list $it" }
-                    ListScreen(list)
+                    ListScreen(notes = database.getList(), onItemClick = {})
                 }
             }
         }
@@ -38,25 +38,44 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    RandomMemoTheme {
-        Greeting("Android")
+fun ListScreen(notes: List<NoteOnList>, onItemClick: (String) -> Unit) {
+    Column {
+        LazyColumn {
+            items(items = notes, key = { it.id }) { note ->
+                Text(
+                    text = note.text,
+                    modifier = Modifier
+                        .clickable { onItemClick(note.text) }
+                        .padding(16.dp)
+                )
+            }
+        }
+        FloatingActionButton(
+            onClick = { /* TODO */ },
+            modifier = Modifier.align(Alignment.End)
+        ) {
+            Icon(Icons.Default.Add, contentDescription = "Add")
+        }
     }
 }
 
+@Preview
 @Composable
-fun ListScreen(recordList: List<String>) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        items(recordList) { todo ->
-            Text(todo)
-        }
+fun EditScreen() {
+    Column {
+        OutlinedTextField(
+            value = "",
+            onValueChange = { /* TODO */ },
+            label = { Text("One line text input") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        OutlinedTextField(
+            value = "",
+            onValueChange = { /* TODO */ },
+            label = { Text("Three line text input") },
+            maxLines = 3,
+            modifier = Modifier.fillMaxWidth()
+        )
+        Switch(checked = false, onCheckedChange = {})
     }
 }
