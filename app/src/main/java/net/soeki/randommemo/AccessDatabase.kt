@@ -7,7 +7,6 @@ import net.soeki.randommemo.db.NoteData
 import net.soeki.randommemo.db.NoteDatabase
 import net.soeki.randommemo.db.NoteOnList
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class AccessDatabase(applicationContext: Context) {
     private val database = Room.databaseBuilder(
         applicationContext,

@@ -8,10 +8,10 @@ import java.util.Date
 
 @Entity(indices = [Index(value = ["id"], unique = true)])
 data class NoteData(
-    @PrimaryKey val id: Long,
-    @ColumnInfo val text: String = "",
-    @ColumnInfo val description: String = "",
-    @ColumnInfo val updateDate: String = ""
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @ColumnInfo var text: String = "",
+    @ColumnInfo var description: String = "",
+    @ColumnInfo var updateDate: String = ""
 )
 
 data class NoteOnList(
