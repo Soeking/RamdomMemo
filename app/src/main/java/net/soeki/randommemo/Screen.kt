@@ -6,13 +6,18 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import net.soeki.randommemo.db.NoteData
 import net.soeki.randommemo.db.NoteOnList
+import kotlin.random.Random
 
 enum class ScreenURL(name: String) {
     List("list-screen"),
@@ -47,29 +52,75 @@ fun EditScreen(
     getNote: (Long) -> NoteData,
     create: (NoteData) -> Unit,
     update: (NoteData) -> Unit,
-    delete: (Long) -> Unit
+    delete: (Long) -> Unit,
+    backScreen: () -> Unit
 ) {
 
-    val note = if (id == 0L) {
-        NoteData()
-    } else {
-        getNote(id)
-    }
+    val note =
+        if (id == 0L)
+            NoteData()
+        else
+            getNote(id)
+
+    var includeOption by rememberSaveable { mutableStateOf(false) }
 
     Column {
         OutlinedTextField(
-            value = "",
+            value = note.text,
             onValueChange = { note.text = it },
-            label = { Text("One line text input") },
+            label = { Text("") },
             modifier = Modifier.fillMaxWidth()
         )
+        Row() {
+            Switch(checked = includeOption, onCheckedChange = { includeOption = !includeOption })
+            Button(
+                onClick = { note.text = generatePass(includeOption) }
+            ) {
+                Text(text = "Generate")
+            }
+        }
         OutlinedTextField(
-            value = "",
-            onValueChange = { /* TODO */ },
-            label = { Text("Three line text input") },
+            value = note.description,
+            onValueChange = { note.description = it },
+            label = { Text("description here") },
             maxLines = 3,
             modifier = Modifier.fillMaxWidth()
         )
-        Switch(checked = false, onCheckedChange = {})
+        Row() {
+            FloatingActionButton(
+                onClick = {
+                    delete(id)
+                    backScreen()
+                }
+            ) {
+                Icon(Icons.Default.Delete, "delete")
+            }
+            FloatingActionButton(
+                onClick = {
+                    if (id == 0L) {
+                        create(note)
+                        backScreen()
+                    } else {
+                        update(note)
+                        backScreen()
+                    }
+                }
+            ) {
+                if (id == 0L)
+                    Icon(Icons.Default.Create, "create")
+                else
+                    Icon(Icons.Default.Check, "update")
+            }
+        }
     }
+}
+
+private fun generatePass(include: Boolean): String {
+    val chars =
+        ('a'..'x').toList() + ('A'..'Z').toList() + ('0'..'9').toList() +
+                if (include) listOf('!', '$', '@', '+', '#', '*') else emptyList()
+    var pass = ""
+    val random = Random(System.currentTimeMillis())
+    repeat(10) { pass += chars.random(random) }
+    return pass
 }

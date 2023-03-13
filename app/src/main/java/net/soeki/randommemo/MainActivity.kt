@@ -53,7 +53,8 @@ class MainActivity : ComponentActivity() {
                     database::getNote,
                     database::insertNote,
                     database::updateNote,
-                    database::deleteNote
+                    database::deleteNote,
+                    navController::navigateUp
                 )
             }
         }
