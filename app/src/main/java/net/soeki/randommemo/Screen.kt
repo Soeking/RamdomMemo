@@ -63,40 +63,52 @@ fun EditScreen(
             getNote(id)
 
     var includeOption by rememberSaveable { mutableStateOf(false) }
+    var text by rememberSaveable { mutableStateOf(note.text) }
+    var description by rememberSaveable { mutableStateOf(note.description) }
 
     Column {
         OutlinedTextField(
-            value = note.text,
-            onValueChange = { note.text = it },
+            value = text,
+            onValueChange = { text = it },
             label = { Text("") },
             modifier = Modifier.fillMaxWidth()
         )
+
         Row() {
             Switch(checked = includeOption, onCheckedChange = { includeOption = !includeOption })
             Button(
-                onClick = { note.text = generatePass(includeOption) }
+                onClick = { text = generatePass(includeOption) }
             ) {
                 Text(text = "Generate")
             }
         }
+
         OutlinedTextField(
-            value = note.description,
-            onValueChange = { note.description = it },
+            value = description,
+            onValueChange = { description = it },
             label = { Text("description here") },
             maxLines = 3,
             modifier = Modifier.fillMaxWidth()
         )
+
+        Text(text = note.updateDate)
+
         Row() {
-            FloatingActionButton(
-                onClick = {
-                    delete(id)
-                    backScreen()
+            if (id != 0L) {
+                FloatingActionButton(
+                    onClick = {
+                        delete(id)
+                        backScreen()
+                    }
+                ) {
+                    Icon(Icons.Default.Delete, "delete")
                 }
-            ) {
-                Icon(Icons.Default.Delete, "delete")
             }
+
             FloatingActionButton(
                 onClick = {
+                    note.text = text
+                    note.description = description
                     if (id == 0L) {
                         create(note)
                         backScreen()
@@ -106,10 +118,7 @@ fun EditScreen(
                     }
                 }
             ) {
-                if (id == 0L)
-                    Icon(Icons.Default.Create, "create")
-                else
-                    Icon(Icons.Default.Check, "update")
+                Icon(Icons.Default.Check, "update")
             }
         }
     }

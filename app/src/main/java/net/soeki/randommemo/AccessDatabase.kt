@@ -6,8 +6,11 @@ import kotlinx.coroutines.*
 import net.soeki.randommemo.db.NoteData
 import net.soeki.randommemo.db.NoteDatabase
 import net.soeki.randommemo.db.NoteOnList
+import java.text.SimpleDateFormat
+import java.util.Date
 
 class AccessDatabase(applicationContext: Context) {
+    private val dateFormat = SimpleDateFormat("yyyy/MM/dd HH:mm")
     private val database = Room.databaseBuilder(
         applicationContext,
         NoteDatabase::class.java,
@@ -30,12 +33,14 @@ class AccessDatabase(applicationContext: Context) {
 
     fun insertNote(note: NoteData): Boolean = runBlocking {
         CoroutineScope(Dispatchers.IO).launch {
+            note.updateDate = dateFormat.format(Date())
             dao.insert(note)
         }.isCompleted
     }
 
     fun updateNote(note: NoteData): Boolean = runBlocking {
         CoroutineScope(Dispatchers.IO).launch {
+            note.updateDate = dateFormat.format(Date())
             dao.update(note)
         }.isCompleted
     }
