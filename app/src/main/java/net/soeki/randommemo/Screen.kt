@@ -48,6 +48,7 @@ fun ListScreen(notes: List<NoteOnList>, onListClick: (Long) -> Unit) {
                     Text(
                         text = note.text,
                         modifier = Modifier
+                            .fillMaxWidth()
                             .clickable { onListClick(note.id) }
                             .padding(16.dp)
                     )
@@ -106,12 +107,21 @@ fun EditScreen(
                     .fillMaxWidth()
                     .padding(10.dp)
             )
+            Spacer(modifier = Modifier.size(5.dp))
 
-            Row(Modifier.padding(1.dp, 0.dp, 1.dp, 8.dp)) {
+            Row(modifier = Modifier.height(IntrinsicSize.Min)) {
                 Switch(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 4.dp)
+                        .wrapContentWidth(Alignment.CenterHorizontally),
                     checked = includeOption,
                     onCheckedChange = { includeOption = !includeOption })
                 Button(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 4.dp)
+                        .wrapContentWidth(Alignment.End),
                     onClick = { text = generatePass(includeOption) }
                 ) {
                     Text(text = "Generate")
