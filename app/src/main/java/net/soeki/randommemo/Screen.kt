@@ -75,6 +75,7 @@ fun EditScreen(
             getNote(id)
 
     var includeOption by rememberSaveable { mutableStateOf(false) }
+    var showAlert by rememberSaveable { mutableStateOf(false) }
     var text by rememberSaveable { mutableStateOf(note.text) }
     var description by rememberSaveable { mutableStateOf(note.description) }
 
@@ -150,13 +151,33 @@ fun EditScreen(
                             .padding(start = 4.dp)
                             .wrapContentWidth(Alignment.End),
                         onClick = {
-                            delete(id)
-                            backScreen()
+                            showAlert = true
                         }
                     ) {
                         Icon(Icons.Default.Delete, "delete")
                     }
             }
+
+            if (showAlert)
+                AlertDialog(onDismissRequest = { showAlert = false },
+                    title = { Text(text = "delete?") },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+                                delete(id)
+                                showAlert = false
+                                backScreen()
+                            }) {
+                            Text(text = "✓")
+                        }
+                    },
+                    dismissButton = {
+                        Button(
+                            onClick = { showAlert = false }) {
+                            Text(text = "×")
+                        }
+                    }
+                )
         }
     }
 }
