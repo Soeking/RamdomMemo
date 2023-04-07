@@ -24,7 +24,6 @@ import net.soeki.randommemo.db.NoteData
 import net.soeki.randommemo.db.NoteOnList
 import kotlin.random.Random
 
-
 enum class ScreenURL(name: String) {
     List("list-screen"),
     Edit("edit-screen/")
@@ -108,7 +107,7 @@ fun EditScreen(
                     .fillMaxWidth()
                     .padding(10.dp)
             )
-            Spacer(modifier = Modifier.size(5.dp))
+            Spacer(modifier = Modifier.size(3.dp))
 
             Row(modifier = Modifier.height(IntrinsicSize.Min)) {
                 Switch(
