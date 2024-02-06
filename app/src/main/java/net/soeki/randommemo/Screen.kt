@@ -3,6 +3,10 @@
 package net.soeki.randommemo
 
 import android.annotation.SuppressLint
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
+import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
+import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,16 +21,90 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
 import net.soeki.randommemo.db.NoteData
 import net.soeki.randommemo.db.NoteOnList
 import kotlin.random.Random
 
 enum class ScreenURL(name: String) {
+    Login("login-screen"),
     List("list-screen"),
     Edit("edit-screen/")
+}
+
+@Composable
+fun LoinScreen(onAuthSuccess:()->Unit){
+    val context = LocalContext.current
+    val biometricManager = remember { BiometricManager.from(context) }
+    val isBiometricAvailable = remember {
+        biometricManager.canAuthenticate(BIOMETRIC_STRONG or DEVICE_CREDENTIAL)
+    }
+    when (isBiometricAvailable) {
+        BiometricManager.BIOMETRIC_SUCCESS -> {
+            // Biometric features are available
+        }
+
+        BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> {
+            // No biometric features available on this device
+        }
+
+        BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE -> {
+            // Biometric features are currently unavailable.
+        }
+
+        BiometricManager.BIOMETRIC_ERROR_SECURITY_UPDATE_REQUIRED -> {
+            // Biometric features available but a security vulnerability has been discovered
+        }
+
+        BiometricManager.BIOMETRIC_ERROR_UNSUPPORTED -> {
+            // Biometric features are currently unavailable because the specified options are incompatible with the current Android version..
+        }
+
+        BiometricManager.BIOMETRIC_STATUS_UNKNOWN -> {
+            // Unable to determine whether the user can authenticate using biometrics
+        }
+
+        BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
+            // The user can't authenticate because no biometric or device credential is enrolled.
+        }
+    }
+
+    val executor = remember { ContextCompat.getMainExecutor(context) }
+    val biometricPrompt = BiometricPrompt(
+        context as FragmentActivity,
+        executor,
+        object : BiometricPrompt.AuthenticationCallback() {
+            override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                super.onAuthenticationError(errorCode, errString)
+                // handle authentication error here
+            }
+
+            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                super.onAuthenticationSucceeded(result)
+                onAuthSuccess()
+            }
+
+            override fun onAuthenticationFailed() {
+                super.onAuthenticationFailed()
+                // handle authentication failure here
+            }
+        }
+    )
+
+    val promptInfo: BiometricPrompt.PromptInfo = BiometricPrompt.PromptInfo.Builder()
+        .setTitle("Biometric Authentication")
+        .setSubtitle("Log in using your biometric credential")
+        .setNegativeButtonText("Cancel")
+        .build()
+
+    Button(onClick = { biometricPrompt.authenticate(promptInfo) }) {
+        Text("Authenticate with Biometrics")
+    }
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
