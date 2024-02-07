@@ -14,6 +14,7 @@ data class NoteData(
     @ColumnInfo var updateDate: String = ""
 )
 
+// リスト表示するときの最小構造
 data class NoteOnList(
     @ColumnInfo val id: Long,
     @ColumnInfo val text: String

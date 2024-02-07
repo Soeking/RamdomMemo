@@ -3,9 +3,6 @@
 package net.soeki.randommemo
 
 import android.annotation.SuppressLint
-import androidx.biometric.BiometricManager
-import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
-import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
 import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -25,8 +22,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
-import androidx.fragment.app.FragmentActivity
 import net.soeki.randommemo.db.NoteData
 import net.soeki.randommemo.db.NoteOnList
 import kotlin.random.Random
@@ -38,72 +33,26 @@ enum class ScreenURL(name: String) {
 }
 
 @Composable
-fun LoinScreen(onAuthSuccess:()->Unit){
+fun LoinScreen(onAuthSuccess: () -> Unit) {
     val context = LocalContext.current
-    val biometricManager = remember { BiometricManager.from(context) }
-    val isBiometricAvailable = remember {
-        biometricManager.canAuthenticate(BIOMETRIC_STRONG or DEVICE_CREDENTIAL)
-    }
-    when (isBiometricAvailable) {
-        BiometricManager.BIOMETRIC_SUCCESS -> {
-            // Biometric features are available
-        }
+    val isEnableBio = getIsEnableBio(context = context)
+    val biometricPrompt = getBiometricPrompt(context = context, onAuthSuccess)
 
-        BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> {
-            // No biometric features available on this device
-        }
-
-        BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE -> {
-            // Biometric features are currently unavailable.
-        }
-
-        BiometricManager.BIOMETRIC_ERROR_SECURITY_UPDATE_REQUIRED -> {
-            // Biometric features available but a security vulnerability has been discovered
-        }
-
-        BiometricManager.BIOMETRIC_ERROR_UNSUPPORTED -> {
-            // Biometric features are currently unavailable because the specified options are incompatible with the current Android version..
-        }
-
-        BiometricManager.BIOMETRIC_STATUS_UNKNOWN -> {
-            // Unable to determine whether the user can authenticate using biometrics
-        }
-
-        BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
-            // The user can't authenticate because no biometric or device credential is enrolled.
-        }
-    }
-
-    val executor = remember { ContextCompat.getMainExecutor(context) }
-    val biometricPrompt = BiometricPrompt(
-        context as FragmentActivity,
-        executor,
-        object : BiometricPrompt.AuthenticationCallback() {
-            override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-                super.onAuthenticationError(errorCode, errString)
-                // handle authentication error here
-            }
-
-            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                super.onAuthenticationSucceeded(result)
-                onAuthSuccess()
-            }
-
-            override fun onAuthenticationFailed() {
-                super.onAuthenticationFailed()
-                // handle authentication failure here
-            }
-        }
-    )
-
-    val promptInfo: BiometricPrompt.PromptInfo = BiometricPrompt.PromptInfo.Builder()
-        .setTitle("Biometric Authentication")
-        .setSubtitle("Log in using your biometric credential")
-        .setNegativeButtonText("Cancel")
+    val promptInfo = BiometricPrompt.PromptInfo.Builder()
+        .setTitle("ログイン")
+        .setSubtitle("生体認証を使用します")
+        .setNegativeButtonText("キャンセル")
         .build()
 
-    Button(onClick = { biometricPrompt.authenticate(promptInfo) }) {
-        Text("Authenticate with Biometrics")
+    Column(
+        modifier =  Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        if (isEnableBio) // 生体認証が有効のときだけ表示
+            Button(onClick = { biometricPrompt.authenticate(promptInfo) }) {
+                Text("Biometrics")
+            }
     }
 }
 
@@ -158,6 +107,7 @@ fun EditScreen(
 
     Scaffold(
         floatingActionButton = {
+            // 登録更新ボタン
             FloatingActionButton(
                 onClick = {
                     note.text = text
@@ -222,6 +172,7 @@ fun EditScreen(
 
             Row(modifier = Modifier.height(IntrinsicSize.Min)) {
                 if (id != 0L)
+                    //削除ボタン
                     FloatingActionButton(
                         modifier = Modifier
                             .weight(1f)
@@ -239,6 +190,7 @@ fun EditScreen(
                 AlertDialog(onDismissRequest = { showAlert = false },
                     title = { Text(text = "delete?") },
                     confirmButton = {
+                        // 続行
                         Button(
                             onClick = {
                                 delete(id)
@@ -249,6 +201,7 @@ fun EditScreen(
                         }
                     },
                     dismissButton = {
+                        // キャンセル
                         Button(
                             onClick = { showAlert = false }) {
                             Text(text = "×")
@@ -259,12 +212,14 @@ fun EditScreen(
     }
 }
 
-private fun generatePass(include: Boolean): String {
+private fun generatePass(isInclude: Boolean): String {
     val chars =
         ('a'..'x').toList() + ('A'..'Z').toList() + ('0'..'9').toList() +
-                if (include) listOf('!', '$', '@', '+', '#', '*') else emptyList()
+                if (isInclude) listOf('!', '$', '@', '+', '#', '*') else emptyList()
     var pass = ""
     val random = Random(System.currentTimeMillis())
+
+    // 10文字固定
     repeat(10) { pass += chars.random(random) }
     return pass
 }

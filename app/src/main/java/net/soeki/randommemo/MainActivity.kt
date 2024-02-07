@@ -40,6 +40,7 @@ class MainActivity : FragmentActivity() {
             composable(ScreenURL.Login.name) {
                 LoinScreen {
                     navController.navigate(ScreenURL.List.name) {
+                        // ログイン画面に戻らないように
                         popUpTo(ScreenURL.Login.name) { inclusive = true }
                     }
                 }
