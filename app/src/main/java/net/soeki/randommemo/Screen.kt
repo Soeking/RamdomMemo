@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
@@ -18,10 +19,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mrhwsn.composelock.ComposeLock
 import net.soeki.randommemo.db.NoteData
 import net.soeki.randommemo.db.NoteOnList
 import kotlin.random.Random
@@ -35,8 +39,15 @@ enum class ScreenURL(name: String) {
 @Composable
 fun LoinScreen(onAuthSuccess: () -> Unit) {
     val context = LocalContext.current
-    val isEnableBio = getIsEnableBio(context = context)
+    val (isEnableBio, isEnablePIN) = getIsEnableBio(context = context)
     val biometricPrompt = getBiometricPrompt(context = context, onAuthSuccess)
+
+    var isPatternMode by rememberSaveable { mutableStateOf(false) }
+    var showErrorMessage by rememberSaveable { mutableStateOf(false) }
+
+    val screenHeight = LocalConfiguration.current.screenHeightDp
+    val screenWidth = LocalConfiguration.current.screenWidthDp
+    val size = minOf(screenHeight, screenWidth)
 
     val promptInfo = BiometricPrompt.PromptInfo.Builder()
         .setTitle("ログイン")
@@ -45,14 +56,53 @@ fun LoinScreen(onAuthSuccess: () -> Unit) {
         .build()
 
     Column(
-        modifier =  Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (isEnableBio) // 生体認証が有効のときだけ表示
-            Button(onClick = { biometricPrompt.authenticate(promptInfo) }) {
-                Text("Biometrics")
+        if (!isPatternMode) {
+            if (isEnableBio) // 生体認証が有効のときだけ表示
+                Button(onClick = { biometricPrompt.authenticate(promptInfo) }) {
+                    Text("Biometrics")
+                }
+            Button(onClick = { isPatternMode = true }) {
+                Text("Pattern")
             }
+        } else {
+            Scaffold(
+                // 左上に戻るボタンを表示
+                topBar = {
+                    TopAppBar(
+                        title = {},
+                        navigationIcon = {
+                            IconButton(onClick = {
+                                isPatternMode = false
+                                showErrorMessage = false
+                            }) {
+                                Icon(Icons.Default.ArrowBack, "back")
+                            }
+                        })
+                }
+            ) {
+                if (showErrorMessage)
+                    Text(text = "try again", color = Color.Red, textAlign = TextAlign.Center)
+                ComposeLock(
+                    modifier = Modifier
+                        .padding(it).offset(0.dp,100.dp)
+                        .fillMaxWidth().size(size.dp),
+                    dimension = 3,
+                    sensitivity = 100f,
+                    dotsColor = MaterialTheme.colorScheme.inversePrimary,
+                    dotsSize = 15f,
+                    linesColor = MaterialTheme.colorScheme.inversePrimary,
+                    linesStroke = 10f,
+                    callback = getPatternLockCallback(
+                        context = context,
+                        onAuthSuccess = onAuthSuccess,
+                        onAuthError = { showErrorMessage = true })
+                )
+            }
+        }
     }
 }
 
@@ -172,7 +222,7 @@ fun EditScreen(
 
             Row(modifier = Modifier.height(IntrinsicSize.Min)) {
                 if (id != 0L)
-                    //削除ボタン
+                //削除ボタン
                     FloatingActionButton(
                         modifier = Modifier
                             .weight(1f)
