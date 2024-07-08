@@ -3,6 +3,10 @@
 package net.soeki.randommemo
 
 import android.annotation.SuppressLint
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.widget.Toast
 import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -11,9 +15,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -88,8 +94,10 @@ fun LoinScreen(onAuthSuccess: () -> Unit) {
                     Text(text = "try again", color = Color.Red, textAlign = TextAlign.Center)
                 ComposeLock(
                     modifier = Modifier
-                        .padding(it).offset(0.dp,100.dp)
-                        .fillMaxWidth().size(size.dp),
+                        .padding(it)
+                        .offset(0.dp, 100.dp)
+                        .fillMaxWidth()
+                        .size(size.dp),
                     dimension = 3,
                     sensitivity = 100f,
                     dotsColor = MaterialTheme.colorScheme.inversePrimary,
@@ -109,6 +117,8 @@ fun LoinScreen(onAuthSuccess: () -> Unit) {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ListScreen(notes: List<NoteOnList>, onListClick: (Long) -> Unit) {
+    val context = LocalContext.current
+
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
@@ -121,13 +131,30 @@ fun ListScreen(notes: List<NoteOnList>, onListClick: (Long) -> Unit) {
         Column {
             LazyColumn {
                 items(items = notes, key = { it.id }) { note ->
-                    Text(
-                        text = note.text,
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { onListClick(note.id) }
-                            .padding(16.dp)
-                    )
+                            .padding(4.dp, 0.dp)
+                            .clickable { onListClick(note.id) },
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = note.text
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        IconButton(
+                            onClick = {
+                                val clipManager =
+                                    context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                val clipData = ClipData.newPlainText("random text", note.text)
+                                clipManager.setPrimaryClip(clipData)
+                                Toast.makeText(context, "copied!", Toast.LENGTH_SHORT).show()
+                            }
+                        ) {
+                            Icon(Icons.Default.Build, "copy")
+                        }
+                    }
                 }
             }
         }
