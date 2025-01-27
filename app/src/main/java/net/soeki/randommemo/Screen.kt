@@ -15,9 +15,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.*
@@ -50,6 +50,7 @@ fun LoinScreen(onAuthSuccess: () -> Unit) {
 
     var isPatternMode by rememberSaveable { mutableStateOf(false) }
     var showErrorMessage by rememberSaveable { mutableStateOf(false) }
+    var showFirstMessage by rememberSaveable { mutableStateOf(false) }
 
     val screenHeight = LocalConfiguration.current.screenHeightDp
     val screenWidth = LocalConfiguration.current.screenWidthDp
@@ -90,25 +91,30 @@ fun LoinScreen(onAuthSuccess: () -> Unit) {
                         })
                 }
             ) {
-                if (showErrorMessage)
-                    Text(text = "try again", color = Color.Red, textAlign = TextAlign.Center)
-                ComposeLock(
-                    modifier = Modifier
-                        .padding(it)
-                        .offset(0.dp, 100.dp)
-                        .fillMaxWidth()
-                        .size(size.dp),
-                    dimension = 3,
-                    sensitivity = 100f,
-                    dotsColor = MaterialTheme.colorScheme.inversePrimary,
-                    dotsSize = 15f,
-                    linesColor = MaterialTheme.colorScheme.inversePrimary,
-                    linesStroke = 10f,
-                    callback = getPatternLockCallback(
-                        context = context,
-                        onAuthSuccess = onAuthSuccess,
-                        onAuthError = { showErrorMessage = true })
-                )
+                Column(modifier = Modifier.padding(it), verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally) {
+                    if (showErrorMessage)
+                        Text(text = "try again", color = Color.Red, textAlign = TextAlign.Center)
+                    if (showFirstMessage)
+                        Text(text = "set the pattern", textAlign = TextAlign.Center)
+                    ComposeLock(
+                        modifier = Modifier
+                            .offset(0.dp, 100.dp)
+                            .fillMaxWidth()
+                            .size(size.dp),
+                        dimension = 3,
+                        sensitivity = 100f,
+                        dotsColor = MaterialTheme.colorScheme.inversePrimary,
+                        dotsSize = 15f,
+                        linesColor = MaterialTheme.colorScheme.inversePrimary,
+                        linesStroke = 10f,
+                        callback = getPatternLockCallback(
+                            context = context,
+                            onAuthSuccess = onAuthSuccess,
+                            onAuthFail = { showErrorMessage = true },
+                            onFirstTime = { showFirstMessage = true },
+                            onSecondTime = { showFirstMessage = false })
+                    )
+                }
             }
         }
     }
@@ -152,7 +158,7 @@ fun ListScreen(notes: List<NoteOnList>, onListClick: (Long) -> Unit) {
                                 Toast.makeText(context, "copied!", Toast.LENGTH_SHORT).show()
                             }
                         ) {
-                            Icon(Icons.Default.Build, "copy")
+                            Icon(Icons.Default.Share, "copy")
                         }
                     }
                 }

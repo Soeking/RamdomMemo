@@ -61,9 +61,15 @@ fun getBiometricPrompt(context: Context, onAuthSuccess: () -> Unit): BiometricPr
 fun getPatternLockCallback(
     context: Context,
     onAuthSuccess: () -> Unit,
-    onAuthError: () -> Unit
+    onAuthFail: () -> Unit,
+    onFirstTime: () -> Unit,
+    onSecondTime: () -> Unit
 ): ComposeLockCallback {
     val auth = Auth(context)
+    if (auth.isSetPattern())
+        onSecondTime()
+    else
+        onFirstTime()
 
     return object : ComposeLockCallback {
         override fun onStart(dot: Dot) {
@@ -79,7 +85,7 @@ fun getPatternLockCallback(
 
             if (auth.isSetPattern()) {
                 if (auth.isCorrectPatternCode(resultCode)) onAuthSuccess()
-                else onAuthError()
+                else onAuthFail()
             } else {
                 auth.setPatternCode(resultCode)
                 onAuthSuccess()
@@ -90,20 +96,36 @@ fun getPatternLockCallback(
 
 class Auth(context: Context) {
 
-    private var masterKey: MasterKey =
-        MasterKey.Builder(context).setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build()
+    private var masterKey: MasterKey
     private var userPref: SharedPreferences
     private val userPrefName = "user_pref"
     private val pattern = "pattern_code"
 
     init {
-        userPref = EncryptedSharedPreferences.create(
-            context,
-            userPrefName,
-            masterKey,
-            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-        )
+        try {
+            masterKey =
+                MasterKey.Builder(context).setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build()
+            userPref = EncryptedSharedPreferences.create(
+                context,
+                userPrefName,
+                masterKey,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+            context.deleteSharedPreferences(userPrefName)
+
+            masterKey =
+                MasterKey.Builder(context).setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build()
+            userPref = EncryptedSharedPreferences.create(
+                context,
+                userPrefName,
+                masterKey,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            )
+        }
     }
 
     // first time -> false, after second -> true
