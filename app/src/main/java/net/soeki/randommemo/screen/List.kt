@@ -26,6 +26,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -59,7 +60,7 @@ fun ListScreen(
                 colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color(0xFF19181A)),
                 scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(),
                 title = {},
-                actions = {
+                navigationIcon = {
                     var expanded by remember { mutableStateOf(false) }
                     Box(
                         modifier = Modifier
@@ -82,16 +83,18 @@ fun ListScreen(
                             )
                         }
                     }
+                },
+                actions = {
+                    FloatingActionButton(
+                        onClick = { onListClick(0) },
+                        shape = FloatingActionButtonDefaults.smallShape
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = "Add")
+                    }
                 }
             )
         },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { onListClick(0) }
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Add")
-            }
-        }
+        floatingActionButton = {}
     ) {
         Column(modifier = Modifier.padding(top = it.calculateTopPadding())) {
             LazyColumn {
