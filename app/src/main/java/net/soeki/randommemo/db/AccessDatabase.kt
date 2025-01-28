@@ -1,11 +1,8 @@
-package net.soeki.randommemo
+package net.soeki.randommemo.db
 
 import android.content.Context
 import androidx.room.Room
 import kotlinx.coroutines.*
-import net.soeki.randommemo.db.NoteData
-import net.soeki.randommemo.db.NoteDatabase
-import net.soeki.randommemo.db.NoteOnList
 import java.text.SimpleDateFormat
 import java.util.Date
 

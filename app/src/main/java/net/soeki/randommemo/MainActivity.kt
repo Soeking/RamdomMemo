@@ -12,6 +12,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import net.soeki.randommemo.db.AccessDatabase
+import net.soeki.randommemo.screen.Migrate
+import net.soeki.randommemo.screen.EditScreen
+import net.soeki.randommemo.screen.ListScreen
+import net.soeki.randommemo.screen.LoginScreen
+import net.soeki.randommemo.screen.ScreenURL
 import net.soeki.randommemo.ui.theme.RandomMemoTheme
 
 class MainActivity : FragmentActivity() {
@@ -49,7 +55,7 @@ class MainActivity : FragmentActivity() {
                 ListScreen(
                     notes = database.getList(),
                     onListClick = { navController.navigate(ScreenURL.Edit.name + it) },
-                    onTransitionMigration = { navController.navigate(ScreenURL.DataMigrate.name) }
+                    onTransitionMigration = { navController.navigate(ScreenURL.Migrate.name) }
                 )
             }
             composable(
@@ -65,8 +71,8 @@ class MainActivity : FragmentActivity() {
                     navController::navigateUp
                 )
             }
-            composable(ScreenURL.DataMigrate.name){
-                DataMigrate()
+            composable(ScreenURL.Migrate.name){
+                Migrate()
             }
         }
     }
