@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.material3.TopAppBar
@@ -39,11 +40,12 @@ import kotlin.random.Random
 enum class ScreenURL(name: String) {
     Login("login-screen"),
     List("list-screen"),
-    Edit("edit-screen/")
+    Edit("edit-screen/"),
+    DataMigrate("data-migrate")
 }
 
 @Composable
-fun LoinScreen(onAuthSuccess: () -> Unit) {
+fun LoginScreen(onAuthSuccess: () -> Unit) {
     val context = LocalContext.current
     val (isEnableBio, isEnablePIN) = getIsEnableBio(context = context)
     val biometricPrompt = getBiometricPrompt(context = context, onAuthSuccess)
@@ -91,7 +93,11 @@ fun LoinScreen(onAuthSuccess: () -> Unit) {
                         })
                 }
             ) {
-                Column(modifier = Modifier.padding(it), verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    modifier = Modifier.padding(it),
+                    verticalArrangement = Arrangement.Bottom,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     if (showErrorMessage)
                         Text(text = "try again", color = Color.Red, textAlign = TextAlign.Center)
                     if (showFirstMessage)
@@ -122,10 +128,45 @@ fun LoinScreen(onAuthSuccess: () -> Unit) {
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ListScreen(notes: List<NoteOnList>, onListClick: (Long) -> Unit) {
+fun ListScreen(
+    notes: List<NoteOnList>,
+    onListClick: (Long) -> Unit,
+    onTransitionMigration: () -> Unit
+) {
     val context = LocalContext.current
 
     Scaffold(
+        topBar = {
+            TopAppBar(
+                colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color(0xFF19181A)),
+                scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(),
+                title = {},
+                actions = {
+                    var expanded by remember { mutableStateOf(false) }
+                    Box(
+                        modifier = Modifier
+                            .padding(16.dp)
+                    ) {
+                        IconButton(onClick = { expanded = !expanded }) {
+                            Icon(Icons.Default.MoreVert, contentDescription = "More options")
+                        }
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Data Migration") },
+                                onClick = { onTransitionMigration() }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Setting Pattern") },
+                                onClick = { }
+                            )
+                        }
+                    }
+                }
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { onListClick(0) }
@@ -134,7 +175,7 @@ fun ListScreen(notes: List<NoteOnList>, onListClick: (Long) -> Unit) {
             }
         }
     ) {
-        Column {
+        Column(modifier = Modifier.padding(top = it.calculateTopPadding())) {
             LazyColumn {
                 items(items = notes, key = { it.id }) { note ->
                     Row(
@@ -293,6 +334,12 @@ fun EditScreen(
                 )
         }
     }
+}
+
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@Composable
+fun DataMigrate() {
+    Column { }
 }
 
 private fun generatePass(isInclude: Boolean): String {

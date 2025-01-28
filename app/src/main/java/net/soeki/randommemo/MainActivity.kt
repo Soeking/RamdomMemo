@@ -38,7 +38,7 @@ class MainActivity : FragmentActivity() {
 
         NavHost(navController = navController, startDestination = ScreenURL.Login.name) {
             composable(ScreenURL.Login.name) {
-                LoinScreen {
+                LoginScreen {
                     navController.navigate(ScreenURL.List.name) {
                         // ログイン画面に戻らないように
                         popUpTo(ScreenURL.Login.name) { inclusive = true }
@@ -48,7 +48,8 @@ class MainActivity : FragmentActivity() {
             composable(ScreenURL.List.name) {
                 ListScreen(
                     notes = database.getList(),
-                    onListClick = { navController.navigate(ScreenURL.Edit.name + it) }
+                    onListClick = { navController.navigate(ScreenURL.Edit.name + it) },
+                    onTransitionMigration = { navController.navigate(ScreenURL.DataMigrate.name) }
                 )
             }
             composable(
@@ -63,6 +64,9 @@ class MainActivity : FragmentActivity() {
                     database::deleteNote,
                     navController::navigateUp
                 )
+            }
+            composable(ScreenURL.DataMigrate.name){
+                DataMigrate()
             }
         }
     }
