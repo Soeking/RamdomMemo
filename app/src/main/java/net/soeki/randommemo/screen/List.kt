@@ -25,8 +25,6 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -40,7 +38,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import net.soeki.randommemo.db.NoteOnList
@@ -57,7 +58,15 @@ fun ListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color(0xFF19181A)),
+                //colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color(0xFF19181A)),
+                modifier = Modifier.drawBehind {
+                    drawLine(
+                        color = Color.White, start = Offset(0f, size.height),
+                        end = Offset(size.width, size.height),
+                        strokeWidth = 1.dp.toPx(),
+                        pathEffect = PathEffect.cornerPathEffect(4f)
+                    )
+                },
                 scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(),
                 title = {},
                 navigationIcon = {
@@ -85,9 +94,8 @@ fun ListScreen(
                     }
                 },
                 actions = {
-                    FloatingActionButton(
-                        onClick = { onListClick(0) },
-                        shape = FloatingActionButtonDefaults.smallShape
+                    IconButton(
+                        onClick = { onListClick(0) }
                     ) {
                         Icon(Icons.Default.Add, contentDescription = "Add")
                     }
