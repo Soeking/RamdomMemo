@@ -28,10 +28,24 @@ class AccessDatabase(applicationContext: Context) {
         }
     }
 
+    fun getAllNote(): List<NoteData> = runBlocking {
+        withContext(CoroutineScope(Dispatchers.IO).coroutineContext) {
+            dao.getAllData()
+        }
+    }
+
     fun insertNote(note: NoteData): Boolean = runBlocking {
         CoroutineScope(Dispatchers.IO).launch {
             note.updateDate = dateFormat.format(Date())
             dao.insert(note)
+        }.isCompleted
+    }
+
+    fun bulkInsertNote(notes: List<NoteData>): Boolean = runBlocking {
+        CoroutineScope(Dispatchers.IO).launch {
+            notes.forEach {
+                dao.insert(NoteData(0, it.text, it.description, it.updateDate))
+            }
         }.isCompleted
     }
 

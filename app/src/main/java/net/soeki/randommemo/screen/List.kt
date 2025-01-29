@@ -58,7 +58,6 @@ fun ListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                //colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color(0xFF19181A)),
                 modifier = Modifier.drawBehind {
                     drawLine(
                         color = Color.White, start = Offset(0f, size.height),

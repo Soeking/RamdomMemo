@@ -71,8 +71,8 @@ class MainActivity : FragmentActivity() {
                     navController::navigateUp
                 )
             }
-            composable(ScreenURL.Migrate.name){
-                Migrate()
+            composable(ScreenURL.Migrate.name) {
+                Migrate(navController::navigateUp, database::getAllNote, database::bulkInsertNote)
             }
         }
     }

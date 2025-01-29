@@ -11,7 +11,10 @@ interface NoteDataDao {
     @Query("SELECT * FROM noteData WHERE id = :targetId")
     suspend fun getById(targetId: Long): NoteData
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Query("SELECT * FROM noteData")
+    suspend fun getAllData():List<NoteData>
+
+    @Insert(onConflict = OnConflictStrategy.NONE)
     suspend fun insert(record: NoteData)
 
     @Update
