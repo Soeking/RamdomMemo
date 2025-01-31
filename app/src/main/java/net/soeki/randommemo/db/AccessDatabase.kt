@@ -3,6 +3,7 @@ package net.soeki.randommemo.db
 import android.content.Context
 import androidx.room.Room
 import kotlinx.coroutines.*
+import net.soeki.randommemo.screen.BackUpData
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -41,7 +42,7 @@ class AccessDatabase(applicationContext: Context) {
         }.isCompleted
     }
 
-    fun bulkInsertNote(notes: List<NoteData>): Boolean = runBlocking {
+    fun bulkInsertNote(notes: List<BackUpData>): Boolean = runBlocking {
         CoroutineScope(Dispatchers.IO).launch {
             notes.forEach {
                 dao.insert(NoteData(0, it.text, it.description, it.updateDate))
