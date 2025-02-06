@@ -12,7 +12,9 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -28,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -78,6 +81,7 @@ fun Migrate(
         Column(
             modifier = Modifier.padding(top = it.calculateTopPadding())
         ) {
+            Spacer(Modifier.size(10.dp))
             Row {
                 Button(
                     onClick = {
@@ -88,11 +92,12 @@ fun Migrate(
                     Text("save backup")
                 }
             }
-            Row {
+            Spacer(Modifier.size(10.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Button(onClick = { showFilePicker = true }) {
                     Text("choose a file")
                 }
-                Text("chosen: $filePath")
+                Text("chosen: $filePath", modifier = Modifier.padding(start = 20.dp))
             }
             Row {
                 FilePicker(
