@@ -4,5 +4,6 @@ enum class ScreenURL(name: String) {
     Login("login-screen"),
     List("list-screen"),
     Edit("edit-screen/"),
-    Migrate("data-migrate")
+    Migrate("data-migrate"),
+    Reset("reset-pattern")
 }

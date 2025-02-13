@@ -51,7 +51,8 @@ import net.soeki.randommemo.db.NoteOnList
 fun ListScreen(
     notes: List<NoteOnList>,
     onListClick: (Long) -> Unit,
-    onTransitionMigration: () -> Unit
+    transitionToMigration: () -> Unit,
+    transitionToReset: () -> Unit
 ) {
     val context = LocalContext.current
 
@@ -83,11 +84,11 @@ fun ListScreen(
                         ) {
                             DropdownMenuItem(
                                 text = { Text("Data Migration") },
-                                onClick = { onTransitionMigration() }
+                                onClick = { transitionToMigration() }
                             )
                             DropdownMenuItem(
                                 text = { Text("Setting Pattern") },
-                                onClick = { }
+                                onClick = { transitionToReset() }
                             )
                         }
                     }

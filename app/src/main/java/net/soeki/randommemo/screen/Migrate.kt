@@ -47,7 +47,7 @@ import java.io.FileOutputStream
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun Migrate(
+fun MigrateScreen(
     backScreen: () -> Unit,
     getAllDataFunction: () -> List<NoteData>,
     bulkInsertFunction: (List<BackUpData>) -> Boolean
