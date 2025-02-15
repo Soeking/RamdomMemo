@@ -8,7 +8,7 @@ import androidx.security.crypto.MasterKey
 import com.mrhwsn.composelock.ComposeLockCallback
 import com.mrhwsn.composelock.Dot
 
-class Auth(context: Context) {
+class Auth(val context: Context) {
     private var masterKey: MasterKey
     private var userPref: SharedPreferences
     private val userPrefName = "user_pref"
@@ -53,9 +53,14 @@ class Auth(context: Context) {
 
     // true -> auth success
     fun isCorrectPatternCode(code: String): Boolean = userPref.getString(pattern, "") == code
+
+    fun updateCode(code: String) {
+        context.deleteSharedPreferences(userPrefName)
+        setPatternCode(code)
+    }
 }
 
-fun getPatternLockCallback(
+fun getPatternLockLoginCallback(
     context: Context,
     onAuthSuccess: () -> Unit,
     onAuthFail: () -> Unit,
@@ -88,5 +93,39 @@ fun getPatternLockCallback(
                 onAuthSuccess()
             }
         }
+    }
+}
+
+fun getPatternLockResetCallback(
+    context: Context,
+    firstInput: () -> Unit,
+    onUpdated: () -> Unit
+): ComposeLockCallback {
+    val auth = Auth(context)
+    var temporary: String? = null
+
+    return object : ComposeLockCallback {
+        override fun onDotConnected(dot: Dot) {
+        }
+
+        override fun onResult(result: List<Dot>) {
+            val resultCode = result.map { it.id }.joinToString("_")
+
+            if (temporary == null) {
+                temporary = resultCode
+                firstInput()
+            } else {
+                if (temporary == resultCode) {
+                    auth.updateCode(resultCode)
+                    onUpdated()
+                } else {
+                    temporary = null
+                }
+            }
+        }
+
+        override fun onStart(dot: Dot) {
+        }
+
     }
 }

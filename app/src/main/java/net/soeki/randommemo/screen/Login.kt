@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.dp
 import com.mrhwsn.composelock.ComposeLock
 import net.soeki.randommemo.auth.getBiometricPrompt
 import net.soeki.randommemo.auth.getIsEnableBio
-import net.soeki.randommemo.auth.getPatternLockCallback
+import net.soeki.randommemo.auth.getPatternLockLoginCallback
 
 @Composable
 fun LoginScreen(onAuthSuccess: () -> Unit) {
@@ -106,7 +106,7 @@ fun LoginScreen(onAuthSuccess: () -> Unit) {
                         dotsSize = 15f,
                         linesColor = MaterialTheme.colorScheme.inversePrimary,
                         linesStroke = 10f,
-                        callback = getPatternLockCallback(
+                        callback = getPatternLockLoginCallback(
                             context = context,
                             onAuthSuccess = onAuthSuccess,
                             onAuthFail = { showErrorMessage = true },
