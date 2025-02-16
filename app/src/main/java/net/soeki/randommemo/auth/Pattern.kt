@@ -99,33 +99,38 @@ fun getPatternLockLoginCallback(
 fun getPatternLockResetCallback(
     context: Context,
     firstInput: () -> Unit,
+    secondInput: () -> Unit,
     onUpdated: () -> Unit
 ): ComposeLockCallback {
     val auth = Auth(context)
-    var temporary: String? = null
 
     return object : ComposeLockCallback {
+        var temporary = ""
+
         override fun onDotConnected(dot: Dot) {
         }
 
         override fun onResult(result: List<Dot>) {
             val resultCode = result.map { it.id }.joinToString("_")
 
-            if (temporary == null) {
-                temporary = resultCode
+            if (temporary == "") {
+                setTmp(resultCode)
                 firstInput()
             } else {
                 if (temporary == resultCode) {
-                    auth.updateCode(resultCode)
                     onUpdated()
-                } else {
-                    temporary = null
+                    auth.updateCode(resultCode)
                 }
+                setTmp("")
+                secondInput()
             }
         }
 
         override fun onStart(dot: Dot) {
         }
 
+        private fun setTmp(code: String) {
+            temporary = code
+        }
     }
 }
