@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -44,6 +45,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 import net.soeki.randommemo.db.NoteOnList
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -107,32 +110,46 @@ fun ListScreen(
         Column(modifier = Modifier.padding(top = it.calculateTopPadding())) {
             LazyColumn {
                 items(items = notes, key = { note -> note.id }) { note ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(4.dp, 0.dp)
-                            .clickable { onListClick(note.id) },
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = note.text
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        IconButton(
-                            onClick = {
-                                val clipManager =
-                                    context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                val clipData = ClipData.newPlainText("random text", note.text)
-                                clipManager.setPrimaryClip(clipData)
-                                Toast.makeText(context, "copied!", Toast.LENGTH_SHORT).show()
-                            }
-                        ) {
-                            Icon(Icons.Default.Share, "copy")
-                        }
-                    }
+                    listRow(note, context, onListClick)
+                    Divider(thickness = 1.dp)
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun listRow(note: NoteOnList, context: Context, onListClick: (Long) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp, 4.dp)
+            .clickable { onListClick(note.id) },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start) {
+            Text(
+                text = note.text
+            )
+            Spacer(modifier = Modifier.width(2.dp))
+            Text(
+                text = note.description,
+                fontSize = 12.sp,
+                lineHeight = 1.em
+            )
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+        IconButton(
+            onClick = {
+                val clipManager =
+                    context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                val clipData = ClipData.newPlainText("random text", note.text)
+                clipManager.setPrimaryClip(clipData)
+                Toast.makeText(context, "copied!", Toast.LENGTH_SHORT).show()
+            }
+        ) {
+            Icon(Icons.Default.Share, "copy")
         }
     }
 }

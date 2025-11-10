@@ -16,5 +16,6 @@ data class NoteData(
 // リスト表示するときの最小構造
 data class NoteOnList(
     @ColumnInfo val id: Long,
-    @ColumnInfo val text: String
+    @ColumnInfo val text: String,
+    @ColumnInfo val description: String
 )

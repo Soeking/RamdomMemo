@@ -1,11 +1,10 @@
 package net.soeki.randommemo.db
 
 import androidx.room.*
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface NoteDataDao {
-    @Query("SELECT id, text FROM noteData")
+    @Query("SELECT id, text, description FROM noteData")
     suspend fun getAllForList(): List<NoteOnList>
 
     @Query("SELECT * FROM noteData WHERE id = :targetId")
