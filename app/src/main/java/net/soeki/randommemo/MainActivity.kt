@@ -1,3 +1,7 @@
+@file:OptIn(ExperimentalCoroutinesApi::class, ExperimentalCoroutinesApi::class,
+    ExperimentalCoroutinesApi::class, FlowPreview::class
+)
+
 package net.soeki.randommemo
 
 import android.os.Bundle
@@ -12,6 +16,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import net.soeki.randommemo.db.AccessDatabase
 import net.soeki.randommemo.screen.MigrateScreen
 import net.soeki.randommemo.screen.EditScreen
@@ -54,7 +60,7 @@ class MainActivity : FragmentActivity() {
             }
             composable(ScreenURL.List.name) {
                 ListScreen(
-                    notes = database.getList(),
+                    notesGetter = database::getList,
                     onListClick = { navController.navigate(ScreenURL.Edit.name + it) },
                     transitionToMigration = { navController.navigate(ScreenURL.Migrate.name) },
                     transitionToReset = { navController.navigate(ScreenURL.Reset.name) }

@@ -17,9 +17,9 @@ class AccessDatabase(applicationContext: Context) {
 
     private val dao = database.noteDataDao()
 
-    fun getList(): List<NoteOnList> = runBlocking {
+    fun getList(search: String): List<NoteOnList> = runBlocking {
         withContext(CoroutineScope(Dispatchers.IO).coroutineContext) {
-            dao.getAllForList()
+            dao.getForList("%$search%")
         }
     }
 
