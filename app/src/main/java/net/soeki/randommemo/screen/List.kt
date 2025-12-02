@@ -53,7 +53,6 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -69,7 +68,6 @@ fun ListScreen(
 ) {
     val context = LocalContext.current
     var searchText by remember { mutableStateOf("") }
-    val scope = rememberCoroutineScope()
     var notes by remember { mutableStateOf(notesGetter("")) }
 
     LaunchedEffect(searchText) {
